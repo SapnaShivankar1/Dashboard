@@ -1,15 +1,32 @@
 import React from "react";
-
-export class AppContainer extends React.Component{
+import { LeftPanel } from "../../components/LeftPanel/LeftPanel";
+import { RightContent } from "../../components/RightContent/RightContent";
+import Header from "../../components/Header/Header";
+import { Footer } from "../../components/Footer/Footer";
+import '../../assets/css/style.css'
+class AppContainer extends React.Component{
     // constructor(parameters) {
         
     // }
 
     render(){
+        console.log('render method');
+
         return (
             <div id="wrapper">
-                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
-            </div>
+            <LeftPanel></LeftPanel>
+
+               <div id="content-wrapper" className="d-flex flex-column">
+
+                   <div id="content"> 
+                       <Header></Header>
+                       <RightContent></RightContent>
+                   </div>
+                   <Footer></Footer>
+
+               </div>
+               
+       </div>
         )
     }
 }
