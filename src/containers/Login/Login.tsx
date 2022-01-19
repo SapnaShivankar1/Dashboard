@@ -1,19 +1,53 @@
 import React from "react";
 import { AuthContainer } from "../../components/AuthContainer/AuthContainer";
 import {useForm , SubmitHandler} from 'react-hook-form'
-    
+import { dbKeyGenerator } from "../../utils/email";
+import { BASE_URL } from "../../env";
+import {sha256} from 'crypto-hash';  
+import { useNavigate } from "react-router-dom";
+
 interface Iform {
     Email: string;
     Password: string;
-    Remember: string;
+    Remember?: string;
 }
 
 export function Login (){
-
+    const navigate = useNavigate();//q
 const { register, handleSubmit, watch, formState : {errors}} = useForm<Iform>();
 
 
-const onSubmit: SubmitHandler<Iform> = data => console.log(data);
+const onSubmit: SubmitHandler<Iform> = data => {
+   
+    // console.log(data);
+    let dbkey = dbKeyGenerator(data.Email);
+
+    fetch(`${BASE_URL}/users/${dbkey}.json`, {
+        method: 'GET',
+        headers:{ContentType : 'application/json'}
+    }).then(result  => result.json() )
+    .then(async(res)=>{
+        console.log(res);
+        const hash =  await sha256(data.Password);
+         if(data.Password ==  hash){
+             alert('logged in')
+            navigate('/')
+         } else{
+            alert('pls register')
+            navigate('/register')
+         }
+    // return;
+    }).catch(()=>{
+        alert("something wrong")
+    })
+}
+
+
+
+
+
+
+
 
     return (
         <AuthContainer title="Welcome back!" ImgClass="bg-login-image">
@@ -29,7 +63,7 @@ const onSubmit: SubmitHandler<Iform> = data => console.log(data);
             </div>
             <div className="form-group">
                 <div className="custom-control custom-checkbox small">
-                    <input type="checkbox" className="custom-control-input" {...register('Remember')} required />
+                    <input type="checkbox" className="custom-control-input" {...register('Remember')} />
                     <label className="custom-control-label">Remember
                         Me</label>
                 </div>

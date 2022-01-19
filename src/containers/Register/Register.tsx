@@ -1,8 +1,10 @@
 import React from "react";
 import { AuthContainer } from "../../components/AuthContainer/AuthContainer";
 import {useForm , SubmitHandler} from 'react-hook-form';
-
-
+import {sha256} from 'crypto-hash';
+import { BASE_URL } from "../../env";
+import { useNavigate } from "react-router-dom";
+import {dbKeyGenerator} from '../../utils/email'
 
 export const Register = () => {
 
@@ -11,11 +13,53 @@ export const Register = () => {
         Lname : string,
         Email : string,
         Password : string,
-        RPassword : string
+        RPassword? : string
+    }
+    const navigator = useNavigate();
+const {register , handleSubmit, watch, formState : {errors}} = useForm<RFormData>();
+    const onSubmit : SubmitHandler<RFormData> = async (data) => {
+        
+        console.log(data);
+
+        if(data.Password !== data.RPassword){
+            alert('password does not match');
+            return;
+        }
+    
+
+
+        let hashPassword = await sha256(data.Password);
+        data.Password = hashPassword;
+        delete data.RPassword;
+
+      let dbkey = dbKeyGenerator(data.Email);
+
+        
+// const navigator = useNavigate(); //q
+        fetch(`${BASE_URL}/users/${dbkey}.json` , {
+
+            method:'PUT',
+            headers: {
+                ContentType : 'application/json'
+            },
+            body: JSON.stringify(data)
+        }).then((res)=>{
+            // console.log({res.status}); ///q
+            console.log({res : res.status});
+            if(res.status == 200){
+                alert('User created!');
+                navigator('/');
+            }
+         
+
+        }).catch(()=>{
+           alert('Failed!');
+        })
+
+
     }
 
-const {register , handleSubmit, watch, formState : {errors}} = useForm<RFormData>();
-    const onSubmit : SubmitHandler<RFormData> = (data) => console.log(data);
+
 
         return (
             <AuthContainer title="Create an Account!" ImgClass="bg-register-image">
