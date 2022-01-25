@@ -35,7 +35,7 @@ const {register , handleSubmit, watch, formState : {errors}} = useForm<RFormData
       let dbkey = dbKeyGenerator(data.Email);
 
         
-// const navigator = useNavigate(); //q
+
         fetch(`${BASE_URL}/users/${dbkey}.json` , {
 
             method:'PUT',

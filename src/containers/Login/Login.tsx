@@ -13,40 +13,45 @@ interface Iform {
 }
 
 export function Login (){
+
     const navigate = useNavigate();//q
-const { register, handleSubmit, watch, formState : {errors}} = useForm<Iform>();
+    const { register, handleSubmit, watch, formState : {errors}} = useForm<Iform>();
 
 
-const onSubmit: SubmitHandler<Iform> = data => {
-   
-    // console.log(data);
-    let dbkey = dbKeyGenerator(data.Email);
+    const onSubmit: SubmitHandler<Iform> = data => {
+    
+        // console.log(data);
+        let dbkey = dbKeyGenerator(data.Email);
 
-    fetch(`${BASE_URL}/users/${dbkey}.json`, {
-        method: 'GET',
-        headers:{ContentType : 'application/json'}
-    }).then(result  => result.json() )
-    .then(async(res)=>{
-        console.log(res);
-        const hash =  await sha256(data.Password);
-         if(data.Password ==  hash){
-             alert('logged in')
-            navigate('/')
-         } else{
-            alert('pls register')
-            navigate('/register')
-         }
-    // return;
-    }).catch(()=>{
-        alert("something wrong")
-    })
-}
+        fetch(`${BASE_URL}/users/${dbkey}.json`, {
+            method: 'GET',
+            headers:{ContentType : 'application/json'}
+        }).then(result  => result.json() )
+        .then(async(res)=>{
+            console.log(res);
+            const hash =  await sha256(data.Password);
+            if(res.Password ==  hash){
+                alert('logged in');
+
+               const sessionData = window.sessionStorage;
+
+               sessionData.setItem('dbkey',dbkey);
+               sessionData.setItem('Fname',res.Fname);
+               sessionData.setItem('Lname',res.Lname);
+               sessionData.setItem('email',res.Email);
 
 
 
 
-
-
+                navigate('/');
+            } else{
+                alert('pls register');
+                navigate('/register');
+            }
+        }).catch(()=>{
+            alert("something wrong");
+        })
+    }
 
 
     return (
@@ -86,8 +91,6 @@ const onSubmit: SubmitHandler<Iform> = data => {
 )
 
 }
-
-
 
 
 // import React from 'react';
